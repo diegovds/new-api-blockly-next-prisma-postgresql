@@ -6,3 +6,33 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String
+  uid        String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  mazes Maze[]
+
+  @@map("users") // no bd se chama users
+}
+
+model Maze {
+  id          Int      @id @default(autoincrement())
+  name        String
+  image       String
+  levels      Json
+  user_id     Int
+  executions  Int?
+  conclusions Int?
+  url_image   String?
+  code        String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "mazes_user_id_foreign")
+
+  @@map("mazes") // no bd se chama mazes
+}
