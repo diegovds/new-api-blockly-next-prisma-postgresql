@@ -8,7 +8,6 @@ import prisma from "../../../libs/prisma";
  * Falta fazer o upload da imagem no S3
  * Falta fazer a atualização da imagem e remoção da antiga no S3 caso o maze seja atualizado
  * Falta fazer a remoção da imagem no S3 caso o maze seja deletado
- * Falta corrigir o bug do maze code quando insere um novo maze (atualmente o code gerado não é reconhecido e insere null no bd)
  */
 
 const apiRoute = nextConnect({
@@ -107,7 +106,6 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
 apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
   const { name, image, levels } = req.body;
   const { id } = req.query;
-  let code;
 
   const options = {
     type: "random", // default "random"
@@ -117,31 +115,30 @@ apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
     splitStatus: false, // default true
   };
   const codeGen = new Generator(options);
-  codeGen.get((error: any, c: any) => {
+  codeGen.get(async (error: any, code: any) => {
     if (error) return console.error(error);
     //console.log("code=", c);
-    code = c;
+
+    const newMaze = await prisma.maze
+      .create({
+        data: {
+          name,
+          executions: 0,
+          conclusions: 0,
+          code: code,
+          image,
+          levels,
+          user_id: parseInt(id as string),
+        },
+      })
+      .catch((e) => {
+        res.json({ error: e });
+      });
+
+    if (newMaze) {
+      res.status(201).json({ status: true, data: newMaze });
+    }
   });
-
-  const newMaze = await prisma.maze
-    .create({
-      data: {
-        name,
-        executions: 0,
-        conclusions: 0,
-        code,
-        image,
-        levels,
-        user_id: parseInt(id as string),
-      },
-    })
-    .catch((e) => {
-      res.json({ error: e });
-    });
-
-  if (newMaze) {
-    res.status(201).json({ status: true, data: newMaze });
-  }
 });
 
 export default apiRoute;
