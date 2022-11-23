@@ -1,14 +1,38 @@
-import { NextApiHandler } from "next";
+import nextConnect from "next-connect";
+import multer from "multer";
+import { NextApiRequest, NextApiResponse } from "next";
+const Generator = require("license-key-generator");
 import prisma from "../../../libs/prisma";
 
+/**
+ * Falta fazer o upload da imagem no S3
+ * Falta fazer a atualização da imagem e remoção da antiga no S3 caso o maze seja atualizado
+ * Falta fazer a remoção da imagem no S3 caso o maze seja deletado
+ * Falta corrigir o bug do maze code quando insere um novo maze (atualmente o code gerado não é reconhecido e insere null no bd)
+ */
+
+const apiRoute = nextConnect({
+  onError(error, req: NextApiRequest, res: NextApiResponse) {
+    res
+      .status(501)
+      .json({ error: `Sorry something Happened! ${error.message}` });
+  },
+  onNoMatch(req: NextApiRequest, res: NextApiResponse) {
+    res.status(405).json({ error: `Method "${req.method}" Not Allowed` });
+  },
+});
+
+apiRoute.use(multer().any());
+
 // Reading maze info
-const handlerShow: NextApiHandler = async (req, res) => {
+apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
   const maze = await prisma.maze.findUnique({
     where: {
       id: parseInt(id as string),
     },
+    include: { user: true },
   });
 
   if (maze) {
@@ -17,11 +41,10 @@ const handlerShow: NextApiHandler = async (req, res) => {
   }
 
   res.json({ error: "Maze não encontrado" });
-};
+});
 
-/* Updating maze info
-// falta fazer a atualização e exclusão da imagem no amazon S3
-const handlerUpdate: NextApiHandler = async (req, res) => {
+// Updating maze info
+apiRoute.put(async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     name,
     image,
@@ -58,10 +81,10 @@ const handlerUpdate: NextApiHandler = async (req, res) => {
     res.json({ message: "Maze atualizado com sucesso", data: updatedMaze });
     return;
   }
-};
+});
 
 // Deleting maze info
-const handlerDestroy: NextApiHandler = async (req, res) => {
+apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
   const deletedMaze = await prisma.maze
@@ -78,18 +101,35 @@ const handlerDestroy: NextApiHandler = async (req, res) => {
     res.json({ message: "Maze deletada com sucesso", data: deletedMaze });
     return;
   }
-};
+});
 
 // Inserting new maze
-// falta fazer a inserção da imagem no amazon S3
-const handlerStore: NextApiHandler = async (req, res) => {
+apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
   const { name, image, levels } = req.body;
   const { id } = req.query;
+  let code;
+
+  const options = {
+    type: "random", // default "random"
+    length: 6, // default 16
+    group: 1, // default 4
+    split: "-", // default "-"
+    splitStatus: false, // default true
+  };
+  const codeGen = new Generator(options);
+  codeGen.get((error: any, c: any) => {
+    if (error) return console.error(error);
+    //console.log("code=", c);
+    code = c;
+  });
 
   const newMaze = await prisma.maze
     .create({
       data: {
         name,
+        executions: 0,
+        conclusions: 0,
+        code,
         image,
         levels,
         user_id: parseInt(id as string),
@@ -102,24 +142,12 @@ const handlerStore: NextApiHandler = async (req, res) => {
   if (newMaze) {
     res.status(201).json({ status: true, data: newMaze });
   }
-};*/
+});
 
-const handler: NextApiHandler = (req, res) => {
-  switch (req.method) {
-    case "GET":
-      handlerShow(req, res);
-      break;
-    /*
-    case "PUT":
-      handlerUpdate(req, res);
-      break;
-    case "DELETE":
-      handlerDestroy(req, res);
-      break;
-    case "POST":
-      handlerStore(req, res);
-      break;*/
-  }
+export default apiRoute;
+
+export const config = {
+  api: {
+    bodyParser: false, // Disallow body parsing, consume as stream
+  },
 };
-
-export default handler;
