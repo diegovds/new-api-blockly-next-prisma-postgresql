@@ -1,5 +1,4 @@
 import { useS3Upload } from "next-s3-upload";
-import { ChangeEvent, ChangeEventHandler } from "react";
 
 export default function UploadPage() {
   let { uploadToS3 } = useS3Upload();
