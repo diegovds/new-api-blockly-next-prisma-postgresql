@@ -103,7 +103,8 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
 });
 
 // Inserting new maze
-apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
+apiRoute.post(async (req: any, res: NextApiResponse) => {
+  let file = req.files[0];
   const { name, image, levels } = req.body;
   const { id } = req.query;
 
@@ -126,7 +127,7 @@ apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
           executions: 0,
           conclusions: 0,
           code: code,
-          image,
+          image: file.originalname,
           levels,
           user_id: parseInt(id as string),
         },
