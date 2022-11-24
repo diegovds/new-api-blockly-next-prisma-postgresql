@@ -2,11 +2,21 @@ import nextConnect from "next-connect";
 import upload from "../../../utils/upload";
 import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
+import aws from "aws-sdk";
 import prisma from "../../../libs/prisma";
+
+aws.config.update({
+  secretAccessKey: process.env.AWS_SECRET,
+  accessKeyId: process.env.AWS_ACCESS,
+  region: process.env.AWS_REGIAO,
+});
+
+const s3 = new aws.S3({
+  /* ... */
+});
 
 /**
  * Falta fazer a atualização da imagem e remoção da antiga no S3 caso o maze seja atualizado
- * Falta fazer a remoção da imagem no S3 caso o maze seja deletado
  */
 
 const apiRoute = nextConnect({
@@ -85,20 +95,50 @@ apiRoute.put(async (req: NextApiRequest, res: NextApiResponse) => {
 apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  const deletedMaze = await prisma.maze
-    .delete({
-      where: {
-        id: parseInt(id as string),
-      },
-    })
-    .catch((e) => {
-      res.json({ error: e.meta });
-    });
+  const maze = await prisma.maze.findUnique({
+    where: {
+      id: parseInt(id as string),
+    },
+    include: { user: true },
+  });
 
-  if (deletedMaze) {
-    res.json({ message: "Maze deletada com sucesso", data: deletedMaze });
-    return;
+  if (maze) {
+    (async () => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET!,
+        Key: maze.image,
+      };
+
+      //console.log(`params ->> `, params);
+
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
+          return;
+        } else {
+          //console.log("\ns3.deleteObject data ->> ", data);
+          return;
+        }
+      });
+    })();
+
+    const deletedMaze = await prisma.maze
+      .delete({
+        where: {
+          id: parseInt(id as string),
+        },
+      })
+      .catch((e) => {
+        res.json({ error: e.meta });
+      });
+
+    if (deletedMaze) {
+      res.json({ message: "Maze deletada com sucesso", data: deletedMaze });
+      return;
+    }
   }
+
+  res.json({ error: "Maze não encontrado" });
 });
 
 // Inserting new maze
