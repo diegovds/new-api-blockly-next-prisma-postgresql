@@ -18,7 +18,11 @@ apiRoute.use(multer().any());
 
 // Getting all mazes
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
-  const mazes = await prisma.maze.findMany();
+  const mazes = await prisma.maze.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+  });
 
   res.status(200).json({ data: mazes });
 });

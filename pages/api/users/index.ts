@@ -19,7 +19,13 @@ apiRoute.use(multer().any());
 // Getting all users
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const users = await prisma.user.findMany({
-    include: { mazes: true },
+    include: {
+      mazes: {
+        orderBy: {
+          created_at: "desc",
+        },
+      },
+    },
   });
 
   res.status(200).json({ data: users });

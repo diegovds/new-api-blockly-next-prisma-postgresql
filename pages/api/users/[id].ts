@@ -25,7 +25,13 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       where: {
         id: parseInt(id as string),
       },
-      include: { mazes: true },
+      include: {
+        mazes: {
+          orderBy: {
+            created_at: "desc",
+          },
+        },
+      },
     });
 
     if (userById) {
@@ -37,7 +43,13 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       where: {
         uid: id as string,
       },
-      include: { mazes: true },
+      include: {
+        mazes: {
+          orderBy: {
+            created_at: "desc",
+          },
+        },
+      },
     });
 
     if (userByUid) {
