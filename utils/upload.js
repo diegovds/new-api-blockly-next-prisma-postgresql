@@ -4,9 +4,9 @@ import multerS3 from "multer-s3";
 import { v4 as uuidv4 } from "uuid";
 
 aws.config.update({
-  secretAccessKey: process.env.AWS_SECRET_KEY,
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  region: process.env.AWS_REGION,
+  secretAccessKey: process.env.AWS_SECRET,
+  accessKeyId: process.env.AWS_ACCESS,
+  region: process.env.AWS_REGIAO,
 });
 
 const s3 = new aws.S3({
