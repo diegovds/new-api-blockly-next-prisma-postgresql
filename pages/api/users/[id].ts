@@ -20,19 +20,33 @@ apiRoute.use(multer().any());
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: parseInt(id as string),
-    },
-    include: { mazes: true },
-  });
+  try {
+    const userById = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id as string),
+      },
+      include: { mazes: true },
+    });
 
-  if (user) {
-    res.json({ data: user });
-    return;
+    if (userById) {
+      res.json({ data: userById });
+      return;
+    }
+  } catch (error) {
+    const userByUid = await prisma.user.findFirst({
+      where: {
+        uid: id as string,
+      },
+      include: { mazes: true },
+    });
+
+    if (userByUid) {
+      res.json({ data: userByUid });
+      return;
+    }
+
+    res.json({ error: "Usuário não encontrado" });
   }
-
-  res.json({ error: "Usuário não encontrado" });
 });
 
 // Updating user info
