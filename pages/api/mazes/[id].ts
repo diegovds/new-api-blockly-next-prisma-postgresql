@@ -1,11 +1,10 @@
 import nextConnect from "next-connect";
-import multer from "multer";
+import upload from "../../../utils/upload";
 import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
 import prisma from "../../../libs/prisma";
 
 /**
- * Falta fazer o upload da imagem no S3
  * Falta fazer a atualização da imagem e remoção da antiga no S3 caso o maze seja atualizado
  * Falta fazer a remoção da imagem no S3 caso o maze seja deletado
  */
@@ -21,7 +20,7 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(multer().any());
+apiRoute.use(upload.single("image"));
 
 // Reading maze info
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -104,8 +103,7 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Inserting new maze
 apiRoute.post(async (req: any, res: NextApiResponse) => {
-  let file = req.files[0];
-  const { name, image, levels } = req.body;
+  const { name, levels } = req.body;
   const { id } = req.query;
 
   const options = {
@@ -127,7 +125,8 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
           executions: 0,
           conclusions: 0,
           code: code,
-          image: file.originalname,
+          image: req.file.key,
+          url_image: req.file.location,
           levels,
           user_id: parseInt(id as string),
         },
