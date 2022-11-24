@@ -5,6 +5,8 @@ const Generator = require("license-key-generator");
 import aws from "aws-sdk";
 import prisma from "../../../libs/prisma";
 
+import cors from "cors";
+
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET,
   accessKeyId: process.env.AWS_ACCESS,
@@ -26,7 +28,7 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(upload.single("image"));
+apiRoute.use(upload.single("image"), cors());
 
 // Reading maze info
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
