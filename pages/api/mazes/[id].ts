@@ -28,6 +28,11 @@ const apiRoute = nextConnect({
 
 apiRoute.use(upload.single("image"));
 
+// Preflight requests
+apiRoute.options(async (_, res: NextApiResponse) => {
+  res.status(201);
+});
+
 // Reading maze info
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
