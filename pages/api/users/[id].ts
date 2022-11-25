@@ -18,7 +18,7 @@ apiRoute.use(multer().any());
 
 // Preflight requests
 apiRoute.options(async (_, res: NextApiResponse) => {
-  res.status(200);
+  res.status(201);
 });
 
 // Reading user info
