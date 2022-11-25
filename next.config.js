@@ -19,6 +19,14 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://new-api-blockly-next-prisma-postgresql.vercel.app/:path*",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
