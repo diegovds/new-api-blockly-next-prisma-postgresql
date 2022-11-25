@@ -16,6 +16,10 @@ const apiRoute = nextConnect({
 
 apiRoute.use(multer().any());
 
+apiRoute.options(async (req, res: NextApiResponse) => {
+  return res.status(200).json({});
+});
+
 // Getting all users
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const users = await prisma.user.findMany({

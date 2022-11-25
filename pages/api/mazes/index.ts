@@ -16,6 +16,10 @@ const apiRoute = nextConnect({
 
 apiRoute.use(multer().any());
 
+apiRoute.options(async (req, res: NextApiResponse) => {
+  return res.status(200).json({});
+});
+
 // Getting all mazes
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const mazes = await prisma.maze.findMany({

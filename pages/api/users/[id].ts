@@ -16,6 +16,10 @@ const apiRoute = nextConnect({
 
 apiRoute.use(multer().any());
 
+apiRoute.options(async (req, res: NextApiResponse) => {
+  return res.status(200).json({});
+});
+
 // Reading user info
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
