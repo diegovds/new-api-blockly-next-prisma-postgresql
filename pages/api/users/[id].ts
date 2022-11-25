@@ -67,7 +67,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Updating user info
 apiRoute.put(async (req: NextApiRequest, res: NextApiResponse) => {
-  const { username, uid } = req.body;
+  const { username, uid, created_at } = req.body;
   const { id } = req.query;
 
   const updatedUser = await prisma.user
@@ -78,6 +78,7 @@ apiRoute.put(async (req: NextApiRequest, res: NextApiResponse) => {
       data: {
         username,
         uid,
+        created_at,
       },
     })
     .catch((e) => {
