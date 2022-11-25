@@ -3,8 +3,6 @@ import multer from "multer";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../libs/prisma";
 
-import cors from "cors";
-
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
     res
@@ -16,7 +14,7 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(multer().any(), cors());
+apiRoute.use(multer().any());
 
 // Getting all users
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
