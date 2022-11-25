@@ -23,7 +23,10 @@ const upload = multer({
       cb(null, { fieldName: file.fieldname });
     },
     key(req, file, cb) {
-      const fileName = `${uuidv4()}.${file.mimetype.slice(6)}`;
+      let format = file.originalname.split(".");
+      let position = format.length;
+
+      const fileName = `${uuidv4()}.${format[position - 1]}`;
 
       cb(null, fileName);
     },
