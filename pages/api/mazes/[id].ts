@@ -28,6 +28,11 @@ const apiRoute = nextConnect({
 
 apiRoute.use(upload.single("image"));
 
+apiRoute.options(async (req, res: NextApiResponse) => {
+  //res.setHeader("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+  return res.status(200).json({});
+});
+
 // Reading maze info
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
