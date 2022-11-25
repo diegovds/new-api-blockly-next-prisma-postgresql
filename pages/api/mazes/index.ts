@@ -18,7 +18,7 @@ apiRoute.use(multer().any());
 
 // Preflight requests
 apiRoute.options(async (_, res: NextApiResponse) => {
-  res.status(201);
+  res.status(200);
 });
 
 // Getting all mazes

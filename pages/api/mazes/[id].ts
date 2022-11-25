@@ -30,7 +30,7 @@ apiRoute.use(upload.single("image"));
 
 // Preflight requests
 apiRoute.options(async (_, res: NextApiResponse) => {
-  res.status(201);
+  res.status(200);
 });
 
 // Reading maze info
