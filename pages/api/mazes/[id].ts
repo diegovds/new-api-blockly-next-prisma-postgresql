@@ -56,6 +56,17 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
   const { name, levels, executions, conclusions, code, created_at } = req.body;
   const { id } = req.query;
 
+  let data: {
+    name?: string;
+    levels?: JSON;
+    image?: string;
+    url_image?: string;
+    executions?: number;
+    conclusions?: number;
+    code?: string;
+    created_at?: Date;
+  } = {};
+
   const maze = await prisma.maze.findUnique({
     where: {
       id: parseInt(id as string),
@@ -63,78 +74,101 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     include: { user: true },
   });
 
-  if (maze) {
-    if (req.file) {
-      (async () => {
-        let params = {
-          Bucket: process.env.AWS_BUCKET!,
-          Key: maze.image,
-        };
+  if (maze && req.file) {
+    (async () => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET!,
+        Key: maze.image,
+      };
 
-        //console.log(`params ->> `, params);
+      //console.log(`params ->> `, params);
 
-        s3.deleteObject(params, function (error, data) {
-          if (error) {
-            //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
-            return;
-          } else {
-            //console.log("\ns3.deleteObject data ->> ", data);
-            return;
-          }
-        });
-      })();
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
+          return;
+        } else {
+          //console.log("\ns3.deleteObject data ->> ", data);
+          return;
+        }
+      });
+    })();
 
-      const updatedMaze = await prisma.maze
-        .update({
-          where: {
-            id: parseInt(id as string),
-          },
-          data: {
-            name,
-            image: req.file.key,
-            url_image: req.file.location,
-            levels,
-            executions: parseInt(executions as string),
-            conclusions,
-            code,
-            created_at,
-          },
-        })
-        .catch((e) => {
-          res.json({ error: e.meta });
-        });
+    data.image = req.file.key;
+    data.url_image = req.file.location;
+  } else if (!maze && req.file) {
+    (async () => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET!,
+        Key: req.file.key,
+      };
 
-      if (updatedMaze) {
-        res.json({ message: "Maze atualizado com sucesso", data: updatedMaze });
-        return;
-      }
-    } else {
-      const updatedMaze = await prisma.maze
-        .update({
-          where: {
-            id: parseInt(id as string),
-          },
-          data: {
-            name,
-            levels,
-            executions: parseInt(executions as string),
-            conclusions,
-            code,
-            created_at,
-          },
-        })
-        .catch((e) => {
-          res.json({ error: e.meta });
-        });
+      //console.log(`params ->> `, params);
 
-      if (updatedMaze) {
-        res.json({ message: "Maze atualizado com sucesso", data: updatedMaze });
-        return;
-      }
-    }
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
+          return;
+        } else {
+          //console.log("\ns3.deleteObject data ->> ", data);
+          return;
+        }
+      });
+    })();
+
+    res.json({ error: "Maze não encontrado" });
+  } else if (!maze && !req.file) {
+    res.json({ error: "Maze não encontrado" });
   }
 
-  res.json({ error: "Maze não encontrado" });
+  if (name) {
+    data.name = name;
+  }
+
+  if (code) {
+    data.code = code;
+  }
+
+  if (executions) {
+    data.executions = parseInt(executions as string);
+  }
+
+  if (conclusions) {
+    data.conclusions = conclusions;
+  }
+
+  if (levels) {
+    data.levels = levels;
+  }
+
+  if (created_at) {
+    data.created_at = created_at;
+  }
+
+  const updatedMaze = await prisma.maze
+    .update({
+      where: {
+        id: parseInt(id as string),
+      },
+      data: {
+        name: data.name,
+        image: data.image,
+        url_image: data.url_image,
+        created_at: data.created_at,
+        conclusions: data.conclusions,
+        code: data.code,
+        executions: data.executions,
+        levels: JSON.stringify(data.levels),
+      },
+    })
+    .catch((e) => {
+      res.json({ error: e.meta });
+    });
+
+  if (updatedMaze) {
+    res.json({ message: "Maze atualizado com sucesso", data: updatedMaze });
+    return;
+  }
 });
 
 // Deleting maze info
