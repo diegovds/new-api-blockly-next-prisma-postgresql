@@ -38,6 +38,13 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       },
     });
 
+    userById?.mazes.forEach((item) => {
+      if (item.name.length > 8) {
+        item.name = item.name.substr(0, 8);
+        item.name = item.name.concat("...");
+      }
+    });
+
     if (userById) {
       res.json({ data: userById });
       return;
@@ -54,6 +61,13 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
           },
         },
       },
+    });
+
+    userByUid?.mazes.forEach((item) => {
+      if (item.name.length > 8) {
+        item.name = item.name.substr(0, 8);
+        item.name = item.name.concat("...");
+      }
     });
 
     if (userByUid) {

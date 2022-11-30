@@ -27,6 +27,12 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       created_at: "desc",
     },
   });
+  mazes.forEach((item) => {
+    if (item.name.length > 8) {
+      item.name = item.name.substr(0, 8);
+      item.name = item.name.concat("...");
+    }
+  });
 
   res.status(200).json({ data: mazes });
 });

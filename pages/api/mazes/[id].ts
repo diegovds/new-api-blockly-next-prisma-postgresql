@@ -53,7 +53,15 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Updating maze info
 apiRoute.put(async (req: any, res: NextApiResponse) => {
-  const { name, levels, executions, conclusions, code, created_at } = req.body;
+  const {
+    name,
+    levels,
+    executions,
+    conclusions,
+    code,
+    created_at,
+    created_at_pt_br,
+  } = req.body;
   const { id } = req.query;
 
   let data: {
@@ -64,6 +72,7 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     executions?: number;
     conclusions?: number;
     code?: string;
+    created_at_pt_br?: string;
     created_at?: Date;
   } = {};
 
@@ -145,6 +154,10 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     data.created_at = created_at;
   }
 
+  if (created_at_pt_br) {
+    data.created_at_pt_br = created_at_pt_br;
+  }
+
   const updatedMaze = await prisma.maze
     .update({
       where: {
@@ -155,6 +168,7 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
         image: data.image,
         url_image: data.url_image,
         created_at: data.created_at,
+        created_at_pt_br: data.created_at_pt_br,
         conclusions: data.conclusions,
         code: data.code,
         executions: data.executions,
@@ -225,6 +239,7 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
 apiRoute.post(async (req: any, res: NextApiResponse) => {
   const { name, levels } = req.body;
   const { id } = req.query;
+  const today = new Date(Date.now());
 
   const options = {
     type: "random", // default "random"
@@ -248,6 +263,7 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
           image: req.file.key,
           url_image: req.file.location,
           levels,
+          created_at_pt_br: today.toLocaleDateString("pt-BR"),
           user_id: parseInt(id as string),
         },
       })
