@@ -20,18 +20,17 @@ model User {
 }
 
 model Maze {
-  id               Int      @id @default(autoincrement())
-  name             String
-  image            String
-  levels           Json
-  user_id          Int
-  executions       Int?
-  conclusions      Int?
-  url_image        String?
-  code             String?
-  created_at_pt_br String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  image       String
+  levels      Json
+  user_id     Int
+  executions  Int?
+  conclusions Int?
+  url_image   String?
+  code        String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "mazes_user_id_foreign")
 
