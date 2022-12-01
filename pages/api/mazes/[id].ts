@@ -36,7 +36,7 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  const maze = await prisma.maze.findUnique({
+  const maze = await prisma.maze.findUniqueOrThrow({
     where: {
       id: parseInt(id as string),
     },
@@ -47,8 +47,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     res.json({ data: maze });
     return;
   }
-
-  res.json({ error: "Maze não encontrado" });
 });
 
 // Updating maze info
