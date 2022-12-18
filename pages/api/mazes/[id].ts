@@ -36,6 +36,19 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
+  interface data {
+    id: number;
+    name: string;
+    code: string;
+    levels: JSON;
+    image: string;
+    url_image: string;
+    executions: number;
+    conclusions: number;
+    created_at: string;
+    username: string;
+  }
+
   const maze = await prisma.maze.findUniqueOrThrow({
     where: {
       id: parseInt(id as string),
@@ -43,8 +56,21 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     include: { user: true },
   });
 
+  let treatedData: data = {
+    id: maze.id,
+    name: maze.name,
+    code: maze.code!,
+    levels: JSON.parse(JSON.stringify(maze.levels)),
+    image: maze.image,
+    url_image: maze.url_image!,
+    executions: maze.executions!,
+    conclusions: maze.conclusions!,
+    created_at: new Date(maze.created_at).toLocaleDateString("pt-BR"),
+    username: maze.user.username,
+  };
+
   if (maze) {
-    res.json({ data: maze });
+    res.json({ data: treatedData });
     return;
   }
 });
