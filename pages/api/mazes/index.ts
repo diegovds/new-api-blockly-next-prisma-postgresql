@@ -22,13 +22,38 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 
 // Getting all mazes
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
+  interface data {
+    id: number;
+    name: string;
+    code: string;
+    url_image: string;
+    created_at: string;
+  }
+
+  let treatedData: data[] = [];
+
   const mazes = await prisma.maze.findMany({
     orderBy: {
       created_at: "desc",
     },
   });
 
-  res.status(200).json({ data: mazes });
+  for (let index = 0; index < mazes.length; index++) {
+    const element = mazes[index];
+
+    treatedData.push({
+      id: element.id,
+      name:
+        element.name.length > 8
+          ? element.name.slice(0, 8) + "..."
+          : element.name,
+      code: element.code!,
+      url_image: element.url_image!,
+      created_at: new Date(element.created_at).toLocaleDateString("pt-BR"),
+    });
+  }
+
+  res.status(200).json({ data: treatedData });
 });
 
 export default apiRoute;
