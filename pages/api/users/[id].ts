@@ -25,7 +25,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
   try {
-    const userById = await prisma.user.findUnique({
+    const userById = await prisma.user.findUniqueOrThrow({
       where: {
         id: parseInt(id as string),
       },
