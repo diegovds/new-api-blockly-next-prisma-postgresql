@@ -24,6 +24,22 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
+  interface maze {
+    id: number;
+    name: string;
+    code: string;
+    url_image: string;
+    created_at: string;
+  }
+
+  interface user {
+    id: number;
+    username: string;
+    mazes: maze[];
+  }
+
+  let treatedMaze: maze[] = [];
+
   try {
     const userById = await prisma.user.findUniqueOrThrow({
       where: {
@@ -39,7 +55,32 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     if (userById) {
-      res.json({ data: userById });
+      if (userById.mazes.length !== undefined) {
+        for (let index = 0; index < userById.mazes.length; index++) {
+          const element = userById.mazes[index];
+
+          treatedMaze.push({
+            id: element.id,
+            name:
+              element.name.length > 8
+                ? element.name.slice(0, 8) + "..."
+                : element.name,
+            code: element.code!,
+            url_image: element.url_image!,
+            created_at: new Date(element.created_at).toLocaleDateString(
+              "pt-BR"
+            ),
+          });
+        }
+      }
+
+      let treatedUser: user = {
+        id: userById.id,
+        username: userById.username,
+        mazes: treatedMaze,
+      };
+
+      res.json({ data: treatedUser });
       return;
     }
   } catch (error) {
@@ -57,7 +98,32 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     if (userByUid) {
-      res.json({ data: userByUid });
+      if (userByUid.mazes.length !== undefined) {
+        for (let index = 0; index < userByUid.mazes.length; index++) {
+          const element = userByUid.mazes[index];
+
+          treatedMaze.push({
+            id: element.id,
+            name:
+              element.name.length > 8
+                ? element.name.slice(0, 8) + "..."
+                : element.name,
+            code: element.code!,
+            url_image: element.url_image!,
+            created_at: new Date(element.created_at).toLocaleDateString(
+              "pt-BR"
+            ),
+          });
+        }
+      }
+
+      let treatedUser: user = {
+        id: userByUid.id,
+        username: userByUid.username,
+        mazes: treatedMaze,
+      };
+
+      res.json({ data: treatedUser });
       return;
     }
 
