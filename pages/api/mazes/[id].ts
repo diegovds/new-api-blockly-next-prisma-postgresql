@@ -140,9 +140,9 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
       });
     })();
 
-    res.json({ error: "Maze não encontrado" });
+    res.status(404).json({ message: "Maze não encontrado" });
   } else if (!maze && !req.file) {
-    res.json({ error: "Maze não encontrado" });
+    res.status(404).json({ message: "Maze não encontrado" });
   }
 
   if (name) {

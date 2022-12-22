@@ -127,7 +127,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       return;
     }
 
-    res.json({ error: "Usuário não encontrado" });
+    res.status(404).json({ message: "Usuário não encontrado" });
   }
 });
 
