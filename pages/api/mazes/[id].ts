@@ -1,9 +1,19 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
-import multerConfig from "../../../utils/multerConfig";
-import uploadToFirebase from "../../../utils/uploadToFirebase";
-import prisma from "../../../libs/prisma";
+import upload from "../../../utils/upload";
+import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
+import aws from "aws-sdk";
+import prisma from "../../../libs/prisma";
+
+aws.config.update({
+  secretAccessKey: process.env.AWS_SECRET,
+  accessKeyId: process.env.AWS_ACCESS,
+  region: process.env.AWS_REGIAO,
+});
+
+const s3 = new aws.S3({
+  /* ... */
+});
 
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
@@ -16,7 +26,7 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(multerConfig.single("image"), uploadToFirebase);
+apiRoute.use(upload.single("image"));
 
 apiRoute.options(async (req, res: NextApiResponse) => {
   return res.status(200).json({});
@@ -88,7 +98,50 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     include: { user: true },
   });
 
-  if (!maze) {
+  if (maze && req.file) {
+    (async () => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET!,
+        Key: maze.image,
+      };
+
+      //console.log(`params ->> `, params);
+
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
+          return;
+        } else {
+          //console.log("\ns3.deleteObject data ->> ", data);
+          return;
+        }
+      });
+    })();
+
+    data.image = req.file.key;
+    data.url_image = req.file.location;
+  } else if (!maze && req.file) {
+    (async () => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET!,
+        Key: req.file.key,
+      };
+
+      //console.log(`params ->> `, params);
+
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
+          return;
+        } else {
+          //console.log("\ns3.deleteObject data ->> ", data);
+          return;
+        }
+      });
+    })();
+
+    res.status(404).json({ message: "Maze não encontrado" });
+  } else if (!maze && !req.file) {
     res.status(404).json({ message: "Maze não encontrado" });
   }
 
@@ -154,6 +207,25 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (maze) {
+    (async () => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET!,
+        Key: maze.image,
+      };
+
+      //console.log(`params ->> `, params);
+
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          //console.log(`\nDeleteImageFromS3 error ->> ${error}`);
+          return;
+        } else {
+          //console.log("\ns3.deleteObject data ->> ", data);
+          return;
+        }
+      });
+    })();
+
     const deletedMaze = await prisma.maze
       .delete({
         where: {
