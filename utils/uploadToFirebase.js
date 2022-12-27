@@ -3,17 +3,16 @@ import { v4 as uuidv4 } from "uuid";
 
 const { privateKey } = JSON.parse(process.env.FIREBASE_PRIVATE_KEY);
 
-admin.initializeApp(
-  {
+if (!admin.apps.length) {
+  admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: privateKey,
     }),
     storageBucket: process.env.FIREBASE_BUCKET,
-  },
-  uuidv4()
-);
+  });
+}
 
 const bucket = admin.storage().bucket();
 
