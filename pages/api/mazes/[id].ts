@@ -204,7 +204,7 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
         },
       })
       .catch((e) => {
-        res.json({ error: e });
+        res.status(400).json({ error: e });
       });
 
     if (newMaze) {
