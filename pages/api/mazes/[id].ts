@@ -172,7 +172,6 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (maze) {
-    removeFromFirebase(maze.image);
     const deletedMaze = await prisma.maze
       .delete({
         where: {
@@ -184,6 +183,8 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
       });
 
     if (deletedMaze) {
+      removeFromFirebase(maze.image);
+
       res.json({ message: "Maze deletado com sucesso", data: deletedMaze });
       return;
     }
