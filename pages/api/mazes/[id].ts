@@ -127,7 +127,7 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     data.created_at = created_at;
   }
 
-  await prisma.maze
+  const updatedMaze = await prisma.maze
     .update({
       where: {
         id: parseInt(id as string),
@@ -143,14 +143,6 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
         levels: JSON.stringify(data.levels),
       },
     })
-    .then(() => {
-      if (oldBackground) {
-        removeFromFirebase(oldBackground);
-      }
-
-      res.json({ message: "Maze atualizado com sucesso" });
-      return;
-    })
     .catch((e) => {
       if (oldBackground) {
         removeFromFirebase(req.file.key);
@@ -158,6 +150,15 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
 
       res.json({ error: e.meta });
     });
+
+  if (updatedMaze) {
+    if (oldBackground) {
+      removeFromFirebase(oldBackground);
+    }
+
+    res.json({ message: "Maze atualizado com sucesso", data: updatedMaze });
+    return;
+  }
 });
 
 // Deleting maze info
