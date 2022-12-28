@@ -3,6 +3,7 @@ import multerConfig from "../../../utils/multerConfig";
 import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
 import upFire from "../../../utils/upFire";
+import removeFromFirebase from "../../../utils/removeFromFirebase";
 import prisma from "../../../libs/prisma";
 
 const apiRoute = nextConnect({
@@ -69,6 +70,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
 apiRoute.put(async (req: any, res: NextApiResponse) => {
   const { name, levels, executions, conclusions, code, created_at } = req.body;
   const { id } = req.query;
+  let oldBackground: string | undefined;
 
   let data: {
     name?: string;
@@ -89,7 +91,16 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
   });
 
   if (!maze) {
+    if (req.file) {
+      removeFromFirebase(req.file.key);
+    }
     res.status(404).json({ message: "Maze não encontrado" });
+  }
+
+  if (req.file) {
+    oldBackground = maze?.image;
+    data.image = req.file.key;
+    data.url_image = req.file.location;
   }
 
   if (name) {
@@ -116,7 +127,7 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     data.created_at = created_at;
   }
 
-  const updatedMaze = await prisma.maze
+  await prisma.maze
     .update({
       where: {
         id: parseInt(id as string),
@@ -132,14 +143,21 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
         levels: JSON.stringify(data.levels),
       },
     })
+    .then(() => {
+      if (oldBackground) {
+        removeFromFirebase(oldBackground);
+      }
+
+      res.json({ message: "Maze atualizado com sucesso" });
+      return;
+    })
     .catch((e) => {
+      if (oldBackground) {
+        removeFromFirebase(req.file.key);
+      }
+
       res.json({ error: e.meta });
     });
-
-  if (updatedMaze) {
-    res.json({ message: "Maze atualizado com sucesso", data: updatedMaze });
-    return;
-  }
 });
 
 // Deleting maze info
@@ -154,6 +172,7 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (maze) {
+    removeFromFirebase(maze.image);
     const deletedMaze = await prisma.maze
       .delete({
         where: {
@@ -161,16 +180,15 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
         },
       })
       .catch((e) => {
-        res.json({ error: e.meta });
+        res.status(400).json({ e });
       });
 
     if (deletedMaze) {
-      res.json({ message: "Maze deletada com sucesso", data: deletedMaze });
+      res.json({ message: "Maze deletado com sucesso", data: deletedMaze });
       return;
     }
   }
-
-  res.json({ error: "Maze não encontrado" });
+  res.status(404).json({ message: "Maze não encontrado" });
 });
 
 // Inserting new maze
@@ -204,6 +222,7 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
         },
       })
       .catch((e) => {
+        removeFromFirebase(req.file.key);
         res.status(400).json({ error: e });
       });
 
