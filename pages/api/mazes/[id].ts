@@ -56,7 +56,9 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     url_image: maze.url_image!,
     executions: maze.executions!,
     conclusions: maze.conclusions!,
-    created_at: new Date(maze.created_at).toLocaleDateString("pt-BR"),
+    created_at: new Date(maze.created_at).toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+    }),
     username: maze.user.username,
   };
 

@@ -68,7 +68,8 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
             code: element.code!,
             url_image: element.url_image!,
             created_at: new Date(element.created_at).toLocaleDateString(
-              "pt-BR"
+              "pt-BR",
+              { timeZone: "America/Sao_Paulo" }
             ),
           });
         }
@@ -111,7 +112,8 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
             code: element.code!,
             url_image: element.url_image!,
             created_at: new Date(element.created_at).toLocaleDateString(
-              "pt-BR"
+              "pt-BR",
+              { timeZone: "America/Sao_Paulo" }
             ),
           });
         }
