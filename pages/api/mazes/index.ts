@@ -29,8 +29,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     image: string;
     url_image: string;
     created_at: string;
-    thumbnail_url: string | null;
-    thumbnail_name: string | null;
   }
 
   let treatedData: data[] = [];
@@ -53,8 +51,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       code: element.code!,
       image: element.image,
       url_image: element.url_image!,
-      thumbnail_name: element.thumbnail_name,
-      thumbnail_url: element.thumbnail_url,
       created_at: new Date(element.created_at).toLocaleDateString("pt-BR", {
         timeZone: "America/Sao_Paulo",
       }),

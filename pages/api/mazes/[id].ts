@@ -3,7 +3,6 @@ import multerConfig from "../../../utils/multerConfig";
 import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
 import upFire from "../../../utils/upFire";
-import takePrintscreen from "../../../utils/takePrintscreen";
 import removeFromFirebase from "../../../utils/removeFromFirebase";
 import prisma from "../../../libs/prisma";
 
@@ -39,8 +38,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     conclusions: number;
     created_at: string;
     username: string;
-    thumbnail_name: string | null;
-    thumbnail_url: string | null;
   }
 
   const maze = await prisma.maze.findUniqueOrThrow({
@@ -57,8 +54,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     levels: JSON.parse(JSON.stringify(maze.levels)),
     image: maze.image,
     url_image: maze.url_image!,
-    thumbnail_name: maze.thumbnail_name,
-    thumbnail_url: maze.thumbnail_url,
     executions: maze.executions!,
     conclusions: maze.conclusions!,
     created_at: new Date(maze.created_at).toLocaleDateString("pt-BR", {
@@ -192,7 +187,6 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (deletedMaze) {
       removeFromFirebase(maze.image);
-      removeFromFirebase(maze.thumbnail_url);
 
       res.json({ message: "Maze deletado com sucesso", data: deletedMaze });
       return;
@@ -205,11 +199,6 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
 apiRoute.post(async (req: any, res: NextApiResponse) => {
   const { name, levels } = req.body;
   const { id } = req.query;
-
-  const { thumbnailName, thumbnailUrl } = await takePrintscreen(
-    levels,
-    req.file.location
-  );
 
   const options = {
     type: "random", // default "random"
@@ -232,15 +221,12 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
           code: code,
           image: req.file.key,
           url_image: req.file.location,
-          thumbnail_name: thumbnailName,
-          thumbnail_url: thumbnailUrl,
           levels,
           user_id: parseInt(id as string),
         },
       })
       .catch((e) => {
         removeFromFirebase(req.file.key);
-        removeFromFirebase(thumbnailUrl);
         res.status(400).json({ error: e });
       });
 
