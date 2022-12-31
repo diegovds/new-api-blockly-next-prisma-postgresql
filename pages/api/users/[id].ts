@@ -28,6 +28,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     id: number;
     name: string;
     code: string;
+    image: string;
     url_image: string;
     created_at: string;
   }
@@ -66,6 +67,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
                 ? element.name.slice(0, 8) + "..."
                 : element.name,
             code: element.code!,
+            image: element.image,
             url_image: element.url_image!,
             created_at: new Date(element.created_at).toLocaleDateString(
               "pt-BR",
@@ -110,6 +112,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
                 ? element.name.slice(0, 8) + "..."
                 : element.name,
             code: element.code!,
+            image: element.image,
             url_image: element.url_image!,
             created_at: new Date(element.created_at).toLocaleDateString(
               "pt-BR",
