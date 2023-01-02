@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+const { chromium } = require("playwright");
 const sharp = require("sharp");
 import upFireThumbnail from "./upFireThumbnail";
 
@@ -12,11 +12,10 @@ const takePrintscreen = async (levels, url_image) => {
     url_image +
     "&reset=1&botaoAjuda=1";
 
-  const browser = await puppeteer.launch();
+  const browser = await chromium.launch();
+
   const page = await browser.newPage();
-  await page.goto(mazeGameUrl, {
-    waitUntil: "networkidle0",
-  });
+  await page.goto(mazeGameUrl);
 
   async function x() {
     return new Promise((resolve, reject) => {
@@ -30,7 +29,7 @@ const takePrintscreen = async (levels, url_image) => {
           },
         });
         resolve(imageBuffer);
-        browser.close();
+        await browser.close();
       }, 1000);
     });
   }
