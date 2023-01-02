@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+const chromium = require("chromium");
 const sharp = require("sharp");
 import upFireThumbnail from "./upFireThumbnail";
 
@@ -13,8 +14,7 @@ const takePrintscreen = async (levels, url_image) => {
     "&reset=1&botaoAjuda=1";
 
   const browser = await puppeteer.launch({
-    executablePath:
-      "./node_modules/puppeteer/.local-chromium/win64-656675/chrome-win/chrome.exe",
+    executablePath: chromium.path,
   });
   const page = await browser.newPage();
   await page.goto(mazeGameUrl, {
@@ -41,11 +41,6 @@ const takePrintscreen = async (levels, url_image) => {
   await x().then((done) => {
     buffer = done;
   });
-
-  /*const buffer = await captureWebsite.buffer(mazeGameUrl, {
-    width: 577,
-    height: 556,
-  });*/
 
   await sharp(buffer)
     .resize({ width: 700, height: 600, fit: "fill" })
