@@ -1,6 +1,5 @@
 import puppeteer from "puppeteer";
-const chromium =
-  "https://unpkg.com/chromium@3.0.3/index.js"; /** importação via CDN */
+const chromium = require("chromium-revision");
 const sharp = require("sharp");
 import upFireThumbnail from "./upFireThumbnail";
 
