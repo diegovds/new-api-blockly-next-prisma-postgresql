@@ -1,9 +1,9 @@
-import captureWebsite from "capture-website";
+import puppeteer from "puppeteer";
 const sharp = require("sharp");
 import upFireThumbnail from "./upFireThumbnail";
 
 const takePrintscreen = async (levels, url_image) => {
-  let bufferNewDimension;
+  let buffer, bufferNewDimension;
 
   const mazeGameUrl =
     "https://myblocklymaze-game.vercel.app/maze.html?levels=" +
@@ -12,10 +12,37 @@ const takePrintscreen = async (levels, url_image) => {
     url_image +
     "&reset=1&botaoAjuda=1";
 
-  const buffer = await captureWebsite.buffer(mazeGameUrl, {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(mazeGameUrl, {
+    waitUntil: "networkidle0",
+  });
+
+  async function x() {
+    return new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        const imageBuffer = await page.screenshot({
+          clip: {
+            x: 0,
+            y: 0,
+            width: 577,
+            height: 556,
+          },
+        });
+        resolve(imageBuffer);
+        browser.close();
+      }, 1000);
+    });
+  }
+
+  await x().then((done) => {
+    buffer = done;
+  });
+
+  /*const buffer = await captureWebsite.buffer(mazeGameUrl, {
     width: 577,
     height: 556,
-  });
+  });*/
 
   await sharp(buffer)
     .resize({ width: 700, height: 600, fit: "fill" })
