@@ -30,8 +30,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     code: string;
     image: string;
     url_image: string;
-    thumbnail_name: string | null;
-    thumbnail_url: string | null;
     created_at: string;
   }
 
@@ -71,8 +69,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
             code: element.code!,
             image: element.image,
             url_image: element.url_image!,
-            thumbnail_name: element.thumbnail_name,
-            thumbnail_url: element.thumbnail_url,
             created_at: new Date(element.created_at).toLocaleDateString(
               "pt-BR",
               { timeZone: "America/Sao_Paulo" }
@@ -118,8 +114,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
             code: element.code!,
             image: element.image,
             url_image: element.url_image!,
-            thumbnail_name: element.thumbnail_name,
-            thumbnail_url: element.thumbnail_url,
             created_at: new Date(element.created_at).toLocaleDateString(
               "pt-BR",
               { timeZone: "America/Sao_Paulo" }
