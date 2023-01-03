@@ -1,10 +1,9 @@
-const chromium = require("chrome-aws-lambda");
-const puppeteer = require("puppeteer-core");
+import puppeteer from "puppeteer";
 const sharp = require("sharp");
 import upFireThumbnail from "./upFireThumbnail";
 
 const takePrintscreen = async (levels, url_image) => {
-  let buffer, bufferNewDimension, executablePath;
+  let buffer, bufferNewDimension;
 
   const mazeGameUrl =
     "https://myblocklymaze-game.vercel.app/maze.html?levels=" +
@@ -13,17 +12,9 @@ const takePrintscreen = async (levels, url_image) => {
     url_image +
     "&reset=1&botaoAjuda=1";
 
-  if (process.env.NODE_ENV !== "production") {
-    executablePath =
-      "./node_modules/puppeteer/.local-chromium/win64-1045629/chrome-win/chrome.exe";
-  } else {
-    executablePath = await chromium.executablePath;
-  }
-
   const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: executablePath,
-    headless: chromium.headless,
+    executablePath:
+      "./node_modules/puppeteer/.local-chromium/win64-1045629/chrome-win/chrome.exe",
   });
 
   const page = await browser.newPage();
