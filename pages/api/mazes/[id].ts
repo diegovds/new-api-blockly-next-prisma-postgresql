@@ -4,7 +4,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
 import upFire from "../../../utils/upFire";
 import removeFromFirebase from "../../../utils/removeFromFirebase";
-import takePrintscreen from "../../../utils/takePrintscreen";
 import prisma from "../../../libs/prisma";
 
 const apiRoute = nextConnect({
@@ -62,13 +61,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     }),
     username: maze.user.username,
   };
-
-  const { thumbnailName, thumbnailUrl } = await takePrintscreen(
-    treatedData.levels,
-    treatedData.url_image
-  );
-
-  console.log(thumbnailName, thumbnailUrl);
 
   if (maze) {
     res.json({ data: treatedData });
