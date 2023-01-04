@@ -3,7 +3,6 @@ import multerConfig from "../../../utils/multerConfig";
 import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
 import upFire from "../../../utils/upFire";
-import takePrintscreen from "../../../utils/takePrintscreen";
 import removeFromFirebase from "../../../utils/removeFromFirebase";
 import prisma from "../../../libs/prisma";
 
@@ -62,13 +61,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     }),
     username: maze.user.username,
   };
-
-  const { thumbnailName, thumbnailUrl } = await takePrintscreen(
-    treatedData.levels,
-    treatedData.url_image
-  );
-
-  console.log(thumbnailName, thumbnailUrl);
 
   if (maze) {
     res.json({ data: treatedData });

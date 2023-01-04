@@ -1,4 +1,4 @@
-const { firefox } = require("playwright");
+import puppeteer from "puppeteer";
 const sharp = require("sharp");
 import upFireThumbnail from "./upFireThumbnail";
 
@@ -12,9 +12,7 @@ const takePrintscreen = async (levels, url_image) => {
     url_image +
     "&reset=1&botaoAjuda=1";
 
-  const browser = await firefox.launch({
-    /*headless: false,*/
-  });
+  const browser = await puppeteer.launch();
 
   const page = await browser.newPage();
   await page.goto(mazeGameUrl, {
