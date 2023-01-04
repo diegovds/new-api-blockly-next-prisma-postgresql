@@ -208,6 +208,11 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
   const { name, levels } = req.body;
   const { id } = req.query;
 
+  const { thumbnailName, thumbnailUrl } = await takePrintscreen(
+    levels,
+    req.file.location
+  );
+
   const options = {
     type: "random", // default "random"
     length: 6, // default 16
@@ -229,12 +234,15 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
           code: code,
           image: req.file.key,
           url_image: req.file.location,
+          thumbnail_name: thumbnailName,
+          thumbnail_url: thumbnailUrl,
           levels,
           user_id: parseInt(id as string),
         },
       })
       .catch((e) => {
         removeFromFirebase(req.file.key);
+        removeFromFirebase(thumbnailUrl);
         res.status(400).json({ error: e });
       });
 
