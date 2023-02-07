@@ -2,7 +2,7 @@ import nextConnect from "next-connect";
 import multerConfig from "../../../utils/multerConfig";
 import { NextApiRequest, NextApiResponse } from "next";
 const Generator = require("license-key-generator");
-import upFire from "../../../utils/upFire";
+import uploadToFirebase from "../../../utils/uploadToFirebase";
 import removeFromFirebase from "../../../utils/removeFromFirebase";
 import prisma from "../../../libs/prisma";
 
@@ -17,7 +17,7 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(multerConfig.single("image"), upFire);
+apiRoute.use(multerConfig.single("image"), uploadToFirebase);
 
 apiRoute.options(async (req, res: NextApiResponse) => {
   return res.status(200).json({});
