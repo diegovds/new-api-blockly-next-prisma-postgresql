@@ -5,6 +5,7 @@ const Generator = require("license-key-generator");
 import uploadToFirebase from "../../../utils/uploadToFirebase";
 import removeFromFirebase from "../../../utils/removeFromFirebase";
 import prisma from "../../../libs/prisma";
+import dayjs from "dayjs";
 
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
@@ -56,9 +57,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     url_image: maze.url_image!,
     executions: maze.executions!,
     conclusions: maze.conclusions!,
-    created_at: new Date(maze.created_at).toLocaleDateString("pt-BR", {
-      timeZone: "America/Sao_Paulo",
-    }),
+    created_at: dayjs(maze.created_at).locale("pt-br").format("DD/MM/YYYY"),
     username: maze.user.username,
   };
 

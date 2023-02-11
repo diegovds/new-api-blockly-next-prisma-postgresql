@@ -2,6 +2,7 @@ import nextConnect from "next-connect";
 import multer from "multer";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../libs/prisma";
+import dayjs from "dayjs";
 
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
@@ -69,10 +70,9 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
             code: element.code!,
             image: element.image,
             url_image: element.url_image!,
-            created_at: new Date(element.created_at).toLocaleDateString(
-              "pt-BR",
-              { timeZone: "America/Sao_Paulo" }
-            ),
+            created_at: dayjs(element.created_at)
+              .locale("pt-br")
+              .format("DD/MM/YYYY"),
           });
         }
       }
@@ -114,10 +114,9 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
             code: element.code!,
             image: element.image,
             url_image: element.url_image!,
-            created_at: new Date(element.created_at).toLocaleDateString(
-              "pt-BR",
-              { timeZone: "America/Sao_Paulo" }
-            ),
+            created_at: dayjs(element.created_at)
+              .locale("pt-br")
+              .format("DD/MM/YYYY"),
           });
         }
       }
