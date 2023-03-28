@@ -1,13 +1,22 @@
 import { storage } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
+import { NextApiRequest, NextApiResponse } from "next";
 
-const uploadToFirebase = async (req, res, next) => {
-  if (!req.file) {
+interface MulterRequest extends NextApiRequest {
+  file: any;
+}
+
+const uploadToFirebase = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  next: any
+) => {
+  if (!(req as MulterRequest).file) {
     return next();
   }
 
-  const image = req.file;
+  const image = (req as MulterRequest).file;
   const imageName = `${uuidv4()}.${image.originalname.split(".").pop()}`;
 
   const imageRef = ref(storage, `/${imageName}`);
@@ -18,8 +27,8 @@ const uploadToFirebase = async (req, res, next) => {
 
   await uploadBytes(imageRef, image.buffer, metadata).then(async (snaphsot) => {
     await getDownloadURL(snaphsot.ref).then((url) => {
-      req.file.key = imageName;
-      req.file.location = url;
+      (req as MulterRequest).file.key = imageName;
+      (req as MulterRequest).file.location = url;
     });
   });
 
