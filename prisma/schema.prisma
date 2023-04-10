@@ -28,8 +28,6 @@ model Maze {
   executions     Int?
   url_image      String?
   code           String?
-  thumbnail_name String?
-  thumbnail_url  String?
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
