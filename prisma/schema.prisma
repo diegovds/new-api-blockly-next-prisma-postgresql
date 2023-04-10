@@ -26,7 +26,6 @@ model Maze {
   levels         Json
   user_id        Int
   executions     Int?
-  conclusions    Int?
   url_image      String?
   code           String?
   thumbnail_name String?

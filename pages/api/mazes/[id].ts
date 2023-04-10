@@ -42,7 +42,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       image: true,
       url_image: true,
       executions: true,
-      conclusions: true,
       created_at: true,
       user: { select: { username: true } },
     },
@@ -56,7 +55,6 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
     image: maze.image,
     url_image: maze.url_image!,
     executions: maze.executions!,
-    conclusions: maze.conclusions!,
     created_at: dayjs(maze.created_at).locale("pt-br").format("DD/MM/YYYY"),
     username: maze.user.username,
   };
@@ -69,7 +67,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Updating maze info
 apiRoute.put(async (req: any, res: NextApiResponse) => {
-  const { name, levels, executions, conclusions, code, created_at } = req.body;
+  const { name, levels, executions, code, created_at } = req.body;
   const { id } = req.query;
   let oldBackground: string | undefined;
 
@@ -106,10 +104,6 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
     data.executions = parseInt(executions as string);
   }
 
-  if (conclusions) {
-    data.conclusions = conclusions;
-  }
-
   if (levels) {
     data.levels = levels;
   }
@@ -128,7 +122,6 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
         image: data.image,
         url_image: data.url_image,
         created_at: data.created_at,
-        conclusions: data.conclusions,
         code: data.code,
         executions: data.executions,
         levels: JSON.stringify(data.levels),
@@ -205,7 +198,6 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
         data: {
           name,
           executions: 0,
-          conclusions: 0,
           code: code,
           image: req.file.key,
           url_image: req.file.location,
