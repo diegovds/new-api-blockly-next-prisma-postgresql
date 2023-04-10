@@ -3,6 +3,7 @@ import multer from "multer";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../libs/prisma";
 import dayjs from "dayjs";
+import { Maze } from "../../../types/Maze";
 
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
@@ -23,16 +24,7 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 
 // Getting all mazes
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
-  interface data {
-    id: number;
-    name: string;
-    code: string;
-    image: string;
-    url_image: string;
-    created_at: string;
-  }
-
-  let treatedData: data[] = [];
+  let treatedData: Maze[] = [];
 
   const mazes = await prisma.maze.findMany({
     orderBy: {

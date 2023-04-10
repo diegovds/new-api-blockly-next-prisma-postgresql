@@ -3,6 +3,8 @@ import multer from "multer";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../libs/prisma";
 import dayjs from "dayjs";
+import { Maze } from "../../../types/Maze";
+import { User } from "../../../types/User";
 
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
@@ -25,29 +27,16 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  interface maze {
-    id: number;
-    name: string;
-    code: string;
-    image: string;
-    url_image: string;
-    created_at: string;
-  }
-
-  interface user {
-    id: number;
-    username: string;
-    mazes: maze[];
-  }
-
-  let treatedMaze: maze[] = [];
+  let treatedMaze: Maze[] = [];
 
   try {
     const userById = await prisma.user.findUniqueOrThrow({
       where: {
         id: parseInt(id as string),
       },
-      include: {
+      select: {
+        id: true,
+        username: true,
         mazes: {
           orderBy: {
             created_at: "desc",
@@ -77,7 +66,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
         }
       }
 
-      let treatedUser: user = {
+      let treatedUser: User = {
         id: userById.id,
         username: userById.username,
         mazes: treatedMaze,
@@ -91,7 +80,9 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
       where: {
         uid: id as string,
       },
-      include: {
+      select: {
+        id: true,
+        username: true,
         mazes: {
           orderBy: {
             created_at: "desc",
@@ -121,7 +112,7 @@ apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
         }
       }
 
-      let treatedUser: user = {
+      let treatedUser: User = {
         id: userByUid.id,
         username: userByUid.username,
         mazes: treatedMaze,

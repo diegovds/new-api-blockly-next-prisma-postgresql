@@ -6,6 +6,8 @@ import uploadToFirebase from "../../../utils/uploadToFirebase";
 import removeFromFirebase from "../../../utils/removeFromFirebase";
 import prisma from "../../../libs/prisma";
 import dayjs from "dayjs";
+import { FullMaze } from "../../../types/FullMaze";
+import { UpdatedMaze } from "../../../types/UpdatedMaze";
 
 const apiRoute = nextConnect({
   onError(error, req: NextApiRequest, res: NextApiResponse) {
@@ -28,27 +30,25 @@ apiRoute.options(async (req, res: NextApiResponse) => {
 apiRoute.get(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  interface data {
-    id: number;
-    name: string;
-    code: string;
-    levels: JSON;
-    image: string;
-    url_image: string;
-    executions: number;
-    conclusions: number;
-    created_at: string;
-    username: string;
-  }
-
   const maze = await prisma.maze.findUniqueOrThrow({
     where: {
       id: parseInt(id as string),
     },
-    include: { user: true },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      levels: true,
+      image: true,
+      url_image: true,
+      executions: true,
+      conclusions: true,
+      created_at: true,
+      user: { select: { username: true } },
+    },
   });
 
-  let treatedData: data = {
+  let treatedData: FullMaze = {
     id: maze.id,
     name: maze.name,
     code: maze.code!,
@@ -73,22 +73,12 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
   const { id } = req.query;
   let oldBackground: string | undefined;
 
-  let data: {
-    name?: string;
-    levels?: JSON;
-    image?: string;
-    url_image?: string;
-    executions?: number;
-    conclusions?: number;
-    code?: string;
-    created_at?: Date;
-  } = {};
+  let data: UpdatedMaze = {};
 
   const maze = await prisma.maze.findUnique({
     where: {
       id: parseInt(id as string),
     },
-    include: { user: true },
   });
 
   if (!maze) {
@@ -170,7 +160,6 @@ apiRoute.delete(async (req: NextApiRequest, res: NextApiResponse) => {
     where: {
       id: parseInt(id as string),
     },
-    include: { user: true },
   });
 
   if (maze) {
